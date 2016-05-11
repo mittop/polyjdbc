@@ -15,20 +15,17 @@
  */
 package org.polyjdbc.core.query;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import org.polyjdbc.core.exception.NonUniqueException;
 import org.polyjdbc.core.exception.QueryExecutionException;
 import org.polyjdbc.core.key.KeyGenerator;
 import org.polyjdbc.core.query.mapper.EmptyMapper;
 import org.polyjdbc.core.query.mapper.ObjectMapper;
 import org.polyjdbc.core.transaction.Transaction;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class TransactionalQueryRunner implements QueryRunner {
 
@@ -82,8 +79,10 @@ public class TransactionalQueryRunner implements QueryRunner {
     }
 
     private <T, C extends Collection<T>> C queryCollection(Query query, ObjectMapper<T> mapper, C collection) {
-        try(PreparedStatement statement = query.createStatementWithValues(transaction);
-            ResultSet resultSet = transaction.executeQuery(statement)){
+        try {
+            PreparedStatement statement = query.createStatementWithValues(transaction);
+            ResultSet resultSet = transaction.executeQuery(statement);
+
             while (resultSet.next()) {
                 collection.add(mapper.createObject(resultSet));
             }
@@ -110,9 +109,8 @@ public class TransactionalQueryRunner implements QueryRunner {
             }
 
             Query rawQuery = insertQuery.build();
-            try(PreparedStatement statement = rawQuery.createStatementWithValues(transaction)) {
-                transaction.executeUpdate(statement);
-            }
+            PreparedStatement statement = rawQuery.createStatementWithValues(transaction);
+            transaction.executeUpdate(statement);
 
             return useSequence ? keyGenerator.getKeyFromLastInsert(transaction) : 0;
         } catch (SQLException exception) {
@@ -125,7 +123,8 @@ public class TransactionalQueryRunner implements QueryRunner {
     @Override
     public int update(UpdateQuery updateQuery) {
         Query rawQuery = updateQuery.build();
-        try (PreparedStatement statement = rawQuery.createStatementWithValues(transaction)){
+        try {
+            PreparedStatement statement = rawQuery.createStatementWithValues(transaction);
             return transaction.executeUpdate(statement);
         } catch (SQLException exception) {
             transaction.rollback();
@@ -136,7 +135,8 @@ public class TransactionalQueryRunner implements QueryRunner {
     @Override
     public int delete(DeleteQuery deleteQuery) {
         Query rawQuery = deleteQuery.build();
-        try(PreparedStatement statement = rawQuery.createStatementWithValues(transaction)){
+        try {
+            PreparedStatement statement = rawQuery.createStatementWithValues(transaction);
             return transaction.executeUpdate(statement);
         } catch (SQLException exception) {
             transaction.rollback();
