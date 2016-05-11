@@ -15,10 +15,10 @@ scmVersion {
 }
 
 project.group = 'org.polyjdbc'
-project.version = scmVersion.version
+project.version = '0.6.2.RELEASE'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 
 repositories {
     mavenCentral()
