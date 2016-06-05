@@ -5,7 +5,7 @@ plugins {
     id 'pl.allegro.tech.build.axion-release' version '1.3.4'
 }
 
-apply from: 'gradle/mavenCentralPublishing.gradle'
+apply from: 'gradle/soupeMavenPublishing.gradle'
 
 scmVersion {
     tag {
@@ -15,7 +15,7 @@ scmVersion {
 }
 
 project.group = 'org.polyjdbc'
-project.version = '0.6.2.RELEASE'
+project.version = '0.6.2-SNAPSHOT'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6

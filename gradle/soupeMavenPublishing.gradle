@@ -1,0 +1,83 @@
+
+apply plugin: 'maven'
+
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+    tasks.withType(Javadoc) {
+        options.addStringOption('Xdoclint:none', '-quiet')
+    }
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+if(project.hasProperty('sign')) {
+    apply plugin: 'signing'
+
+    signing {
+        sign configurations.archives
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            if(project.hasProperty('sign')) {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+            }
+
+            def releaseUser = project.ext.has('releaseUser') ? project.ext.releaseUser : ''
+            def releasePassword = project.ext.has('releasePassword') ? project.ext.releasePassword : ''
+
+            repository(url: 'http://ci.mittop.io:8081/nexus/content/repositories/soupe-releases') {
+                authentication(userName: releaseUser, password: releasePassword)
+            }
+
+            def snapshotUser = project.ext.has('snapshotUser') ? project.ext.snapshotUser : ''
+            def snapshotPassword = project.ext.has('snapshotPassword') ? project.ext.snapshotPassword : ''
+
+            snapshotRepository(url: 'http://ci.mittop.io:8081/nexus/content/repositories/soupe-snapshots') {
+                authentication(userName: snapshotUser, password: snapshotPassword)
+            }
+
+            pom.project {
+                name 'polyjdbc'
+
+                packaging 'jar'
+
+                description 'PolyJDBC - lightweight JDBC abstraction supporting transactions, multiple databases and rich schema inspection/creationd.'
+                url 'http://polyjdbc.org'
+                inceptionYear '2014'
+
+                scm {
+                    connection 'scm:git:git@github.com:polyjdbc/polyjdbc.git'
+                    developerConnection 'scm:git:git@github.com:polyjdbc/polyjdbc.git'
+                    url 'https://github.com/polyjdbc/polyjdbc'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        name 'Adam Dubiel'
+                    }
+                }
+            }
+        }
+    }
+}
