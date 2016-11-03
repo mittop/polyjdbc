@@ -9,6 +9,8 @@ public class KeyGeneratorFactory {
         switch (DialectRegistry.valueOf(dialect.getCode())) {
             case H2:
                 return new SequenceAllocation(dialect);
+            case HSQL:
+                return new SequenceAllocation(dialect);
             case POSTGRES:
                 return new SequenceAllocation(dialect);
             case MYSQL:
@@ -16,6 +18,8 @@ public class KeyGeneratorFactory {
             case ORACLE:
                 return new SequenceAllocation(dialect);
             case MSSQL:
+                return new SequenceAllocation(dialect);
+            case DB2:
                 return new SequenceAllocation(dialect);
             default:
                 throw new IllegalStateException("Cannot create key generator for unknown dialect: " + dialect.getCode());

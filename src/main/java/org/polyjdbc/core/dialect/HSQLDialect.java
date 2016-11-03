@@ -19,27 +19,15 @@ package org.polyjdbc.core.dialect;
  *
  * @author Adam Dubiel
  */
-public enum DialectRegistry {
+public class HSQLDialect extends AbstractDialect {
 
-    H2(new H2Dialect()),
-    HSQL(new HSQLDialect()),
-    POSTGRES(new PostgresDialect()),
-    MYSQL(new MysqlDialect()),
-    MSSQL(new MsSqlDialect()),
-    ORACLE(new OracleDialect()),
-    DB2(new DB2Dialect());
-
-    private final Dialect dialect;
-
-    private DialectRegistry(Dialect dialect) {
-        this.dialect = dialect;
+    @Override
+    public String getCode() {
+        return DialectRegistry.HSQL.name();
     }
 
-    public Dialect getDialect() {
-        return dialect;
-    }
-
-    public static Dialect dialect(String dialectCode) {
-        return DialectRegistry.valueOf(dialectCode).getDialect();
+    @Override
+    public String nextFromSequence(String sequenceName) {
+        return "SELECT " + sequenceName + ".nextval";
     }
 }
